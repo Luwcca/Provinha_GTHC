@@ -1,4 +1,6 @@
 using Desafio_BackEnd.Data;
+using DesafioBackEnd_Api.Data.Interfaces;
+using DesafioBackEnd_Api.Data.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +20,13 @@ public class Program
 
         builder.Services.AddDbContext<UserContext>(options =>
                 options.UseSqlite("Data Source=..\\Usuarios\\users.db;"));
-        
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
 
         var app = builder.Build();
 

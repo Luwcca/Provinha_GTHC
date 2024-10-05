@@ -1,32 +1,27 @@
-using AutoMapper;
-using Desafio_BackEnd.Data;
 using Desafio_BackEnd.Data.Models;
 using Desafio_BackEnd.Model;
 using DesafioBackEnd_Api.Data.Dtos;
+using DesafioBackEnd_Api.Data.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Desafio_BackEnd.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UsersController(UserContext context, IMapper mapper) : ControllerBase
+public class UsersController(IUserRepository repository) : ControllerBase
 {
 
-    private readonly UserContext _userContext = context;
-    private readonly IMapper _mapper = mapper;
+    private readonly IUserRepository _userRepository = repository;
 
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<User>> RetornaTodosUsuarios()
     {
-        return Ok(_userContext.Users);
+        return Ok(_userRepository.RetornaTodosUsuarios());
     }
 
     [HttpGet("{id}")]
@@ -34,7 +29,7 @@ public class UsersController(UserContext context, IMapper mapper) : ControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<User> RetornaUsuarioPorId(int id)
     {
-        var user = _userContext.Users.Find(id);
+        var user = _userRepository.RetornaUsuarioPorId(id);
 
         if (user == null)
             return NotFound("Usuário não encontrado.");
@@ -47,18 +42,19 @@ public class UsersController(UserContext context, IMapper mapper) : ControllerBa
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult<User> AdicionaUsuario([FromBody] CreateUserDTO user)
     {
-        var novoUser = _mapper.Map<User>(user);
+
         try
         {
-            _userContext.Users.Add(novoUser);
-            _userContext.SaveChanges();
+            var novoUser = _userRepository.AdicionaUsuario(user);
+
+            return Created($"api/user/{novoUser.Id}", novoUser);
         }
         catch (Exception)
         {
             return BadRequest("Dados inválidos.");
         }
 
-        return Created($"api/user/{novoUser.Id}", novoUser);
+
     }
 
     [HttpPut("{id}")]
@@ -67,22 +63,22 @@ public class UsersController(UserContext context, IMapper mapper) : ControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<User> AtualizaUsuario(int id, [FromBody] UpdateUserDTO user)
     {
-        var userAntigo = _userContext.Users.Find(id);
-
-        if (userAntigo == null)
-            return NotFound("Usuário não encontrado.");
-
         try
         {
-            _mapper.Map(user, userAntigo);
-            _userContext.SaveChanges();
+            var userAtualizado = _userRepository.AtualizaUsuario(id, user);
+
+            return Ok(userAtualizado);
+        }
+        catch (NullReferenceException)
+        {
+            return NotFound("Usuário não encontrado.");
         }
         catch (Exception)
         {
             return BadRequest("Dados inválidos.");
         }
 
-        return Ok(userAntigo);
+
     }
 
     [HttpDelete("{id}")]
@@ -90,13 +86,16 @@ public class UsersController(UserContext context, IMapper mapper) : ControllerBa
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<User> DeletaUsuarioPorId(int id)
     {
-        var user = _userContext.Users.Find(id);
+        try
+        {
+            _userRepository.DeletaUsuarioPorId(id);
 
-        if (user == null) { return NotFound("Usuário não encontrado."); }
+            return NoContent();
+        }
+        catch (NullReferenceException)
+        {
+            return NotFound("Usuário não encontrado.");
+        }
 
-        _userContext.Users.Remove(user);
-        _userContext.SaveChanges();
-
-        return NoContent();
     }
 }
