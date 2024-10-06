@@ -17,6 +17,7 @@ namespace Desafio_BackEnd_Tests.UnitTests;
 
 public class UserControllerTests
 {
+    //Mock o repositorio para simular as alterações no banco
     private readonly Mock<IUserRepository> _mockRespository;
     private readonly UsersController _usersController;
     private readonly CreateUserDTO _createUser;
@@ -25,7 +26,7 @@ public class UserControllerTests
     private readonly User _user;
 
     public UserControllerTests()
-    {
+    {   
         _user = new User { Id = 1, Name = "Test", Email = "teste@email.com" };
         _users =
         [
@@ -43,10 +44,12 @@ public class UserControllerTests
     [Fact]
     public void RetornaTodosUsuarios_Returns_IEnumerableOfUsers()
     {
+        //Realiza o Setup para o caso correto
         _mockRespository.Setup(x => x.RetornaTodosUsuarios()).Returns(_users);
 
         var result = _usersController.RetornaTodosUsuarios();
 
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<OkObjectResult>(result.Result).StatusCode.Equals(200);
     }
@@ -55,10 +58,12 @@ public class UserControllerTests
     [Fact]
     public void RetornaUsuarioPorId_Returns_User()
     {
+        //Realiza o Setup para o caso correto
         _mockRespository.Setup(x => x.RetornaUsuarioPorId(1)).Returns(_user);
 
         var result = _usersController.RetornaUsuarioPorId(1);
 
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<OkObjectResult>(result.Result).StatusCode.Equals(200);
     }
@@ -66,9 +71,10 @@ public class UserControllerTests
     [Fact]
     public void RetornaUsuarioPorId_Returns_UserNotFound()
     {
-
+        //Sem o Setup para o caso incorreto
         var result = _usersController.RetornaUsuarioPorId(1);
 
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<NotFoundObjectResult>(result.Result).StatusCode.Equals(404);
     }
@@ -76,11 +82,12 @@ public class UserControllerTests
     [Fact]
     public void AdicionaUsuario_Returns_User()
     {
-
+        //Realiza o Setup para o caso correto
         _mockRespository.Setup(x => x.AdicionaUsuario(_createUser)).Returns(_user);
 
         var result = _usersController.AdicionaUsuario(_createUser);
 
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<CreatedResult>(result.Result).StatusCode.Equals(201);
     }
@@ -88,12 +95,13 @@ public class UserControllerTests
     [Fact]
     public void AdicionaUsuario_Returns_UserBadRequest()
     {
-
+        //Realiza o Setup para o caso onde é lançado uma excessão
         _mockRespository.Setup(x => x.AdicionaUsuario(_createUser)).Throws(new Exception());
 
 
         var result = _usersController.AdicionaUsuario(_createUser);
 
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<BadRequestObjectResult>(result.Result).StatusCode.Equals(400);
     }
@@ -101,12 +109,13 @@ public class UserControllerTests
     [Fact]
     public void AtualizaUsuario_Returns_User()
     {
-
+        //Realiza o Setup para o caso correto
         _mockRespository.Setup(x => x.AtualizaUsuario(1, _updateUser)).Returns(_user);
 
 
         var result = _usersController.AtualizaUsuario(1, _updateUser);
 
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<OkObjectResult>(result.Result).StatusCode.Equals(200);
     }
@@ -114,13 +123,14 @@ public class UserControllerTests
     [Fact]
     public void AtualizaUsuario_Returns_UserNotFound()
     {
+        //Realiza o Setup para o caso onde é lançado uma excessão
 
         _mockRespository.Setup(x => x.AtualizaUsuario(1, _updateUser)).Throws(new NullReferenceException());
 
 
         var result = _usersController.AtualizaUsuario(1, _updateUser);
 
-
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<NotFoundObjectResult>(result.Result).StatusCode.Equals(404);
     }
@@ -128,13 +138,14 @@ public class UserControllerTests
     [Fact]
     public void AtualizaUsuario_Returns_UserBadRequest()
     {
+        //Realiza o Setup para o caso onde é lançado uma excessão
 
         _mockRespository.Setup(x => x.AtualizaUsuario(1, _updateUser)).Throws(new Exception());
 
 
         var result = _usersController.AtualizaUsuario(1, _updateUser);
 
-
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<BadRequestObjectResult>(result.Result).StatusCode.Equals(400);
     }
@@ -142,10 +153,10 @@ public class UserControllerTests
     [Fact]
     public void DeletaUsuario_Returns_NoContent()
     {
-
+        //Sem o Setup pois o metodo de deletar é void
         var result = _usersController.DeletaUsuarioPorId(1);
 
-
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<NoContentResult>(result.Result).StatusCode.Equals(204);
     }
@@ -153,13 +164,13 @@ public class UserControllerTests
     [Fact]
     public void DeletaUsuario_Returns_UserNotFound()
     {
-
+        //Realiza o Setup para o caso onde é lançado uma excessão
         _mockRespository.Setup(x => x.DeletaUsuarioPorId(1)).Throws(new NullReferenceException());
 
 
         var result = _usersController.DeletaUsuarioPorId(1);
 
-
+        //Verifica o resultado
         Assert.NotNull(result);
         Assert.IsType<NotFoundObjectResult>(result.Result).StatusCode.Equals(404);
     }

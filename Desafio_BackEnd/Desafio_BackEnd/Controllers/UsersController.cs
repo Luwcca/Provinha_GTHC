@@ -13,7 +13,7 @@ namespace Desafio_BackEnd.Controllers;
 [Route("api/users")]
 public class UsersController(IUserRepository repository) : ControllerBase
 {
-
+    // Por meio da implentação da Interface é realizado a invesão de dependencia para invocar os metodos da classe Repositorio
     private readonly IUserRepository _userRepository = repository;
 
 

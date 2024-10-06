@@ -2,12 +2,10 @@ using Desafio_BackEnd.Data;
 using DesafioBackEnd_Api.Data.Interfaces;
 using DesafioBackEnd_Api.Data.Repository;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 public class Program
 {
@@ -16,7 +14,7 @@ public class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+        //Adição Serviços, Scope do Repositorio para injeção de dependecia, Sqlite3 e Automapper
 
         builder.Services.AddDbContext<UserContext>(options =>
                 options.UseSqlite("Data Source=..\\Usuarios\\users.db;"));
